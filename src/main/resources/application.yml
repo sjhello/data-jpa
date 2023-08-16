@@ -4,3 +4,17 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: jpa_user
     password: jpa_user123
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+    generate-ddl: true
+
+server:
+  port: 8889
+
+logging:
+  level:
+    org.hibernate.SQL: debug
