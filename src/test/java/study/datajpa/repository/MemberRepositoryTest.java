@@ -48,4 +48,16 @@ class MemberRepositoryTest {
 
         assertThat(members).hasSize(1);
     }
+
+    @Test
+    void findUser() {
+        Member sjhello = new Member("sjhello", 30);
+        Member bailey = new Member("bailey", 30);
+
+        memberRepository.save(sjhello);
+        memberRepository.save(bailey);
+
+        List<Member> members = memberRepository.findUser("sjhello", 30);
+        assertThat(members).hasSize(1);
+    }
 }
