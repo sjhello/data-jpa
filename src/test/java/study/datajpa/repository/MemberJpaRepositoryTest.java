@@ -102,7 +102,7 @@ class MemberJpaRepositoryTest {
         Member sjhello = new Member("sjhello", 30);
         memberJpaRepository.save(sjhello);
 
-        List<Member> members = memberJpaRepository.findUser(sjhello.getUsername());
+        List<Member> members = memberJpaRepository.findByUsername(sjhello.getUsername());
 
         assertThat(members).hasSize(1);
     }

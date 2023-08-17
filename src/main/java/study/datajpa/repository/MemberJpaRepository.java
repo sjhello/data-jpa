@@ -47,7 +47,7 @@ public class MemberJpaRepository {
     }
 
     @Query(name = "Member.findByUsername")      // 생략 가능
-    public List<Member> findUser(String username) {
+    public List<Member> findByUsername(String username) {
         return em.createNamedQuery("Member.findByUsername", Member.class)
                 .setParameter("username", username)
                 .getResultList();
