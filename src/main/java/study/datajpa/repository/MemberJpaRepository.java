@@ -1,6 +1,7 @@
 package study.datajpa.repository;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import study.datajpa.entity.Member;
 
@@ -41,6 +42,19 @@ public class MemberJpaRepository {
     public List<Member> findByUsernameAndAgeGreaterThan(String username, Integer age) {
         return em.createQuery("select m from Member m where m.username = :username and m.age > :age", Member.class)
                 .setParameter("username", username)
+                .setParameter("age", age)
+                .getResultList();
+    }
+
+    @Query(name = "Member.findByUsername")      // 생략 가능
+    public List<Member> findUser(String username) {
+        return em.createNamedQuery("Member.findByUsername", Member.class)
+                .setParameter("username", username)
+                .getResultList();
+    }
+
+    public List<Member> findByAge(Integer age) {
+        return em.createNamedQuery("Member.findByAge", Member.class)
                 .setParameter("age", age)
                 .getResultList();
     }

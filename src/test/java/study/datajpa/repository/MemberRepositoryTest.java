@@ -37,4 +37,15 @@ class MemberRepositoryTest {
 
         assertThat(members).hasSize(3);
     }
+
+    @Test
+    @DisplayName("이름으로 회원을 조회하다 - Named Query")
+    void findByUsername() {
+        Member sjhello = new Member("sjhello", 30);
+        memberRepository.save(sjhello);
+
+        List<Member> members = memberRepository.findByUsername(sjhello.getUsername());
+
+        assertThat(members).hasSize(1);
+    }
 }

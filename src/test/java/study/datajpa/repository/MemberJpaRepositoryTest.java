@@ -95,4 +95,26 @@ class MemberJpaRepositoryTest {
 
         assertThat(members).hasSize(3);
     }
+
+    @Test
+    @DisplayName("이름으로 회원을 조회하다 - Named Query")
+    void findByUsername() {
+        Member sjhello = new Member("sjhello", 30);
+        memberJpaRepository.save(sjhello);
+
+        List<Member> members = memberJpaRepository.findUser(sjhello.getUsername());
+
+        assertThat(members).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("나이로 회원을 조회하다 - Named Query")
+    void findByAge() {
+        Member sjhello = new Member("sjhello", 30);
+        memberJpaRepository.save(sjhello);
+
+        List<Member> members = memberJpaRepository.findByAge(sjhello.getAge());
+
+        assertThat(members).hasSize(1);
+    }
 }
