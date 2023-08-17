@@ -16,11 +16,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-@Rollback(value = false)
+@Rollback
 class MemberJpaRepositoryTest {
 
     @Autowired
-    MemberJpaRepository memberJpaRepository;
+    MemberRepository memberJpaRepository;
 
     @Test
     @DisplayName("회원을 생성한다")
@@ -39,8 +39,8 @@ class MemberJpaRepositoryTest {
         Optional<Member> findMember = memberJpaRepository.findById(2L);
 
         assertThat(findMember.isEmpty()).isTrue();
-        assertThat(findMember.isPresent()).isTrue();    // fail, actual false
-        assertThat(findMember.isPresent()).isFalse();    // success, the value is not present
+//        assertThat(findMember.isPresent()).isTrue();    // fail, actual false
+//        assertThat(findMember.isPresent()).isFalse();    // success, the value is not present
     }
 
     @Test
