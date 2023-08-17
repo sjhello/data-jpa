@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -20,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class MemberJpaRepositoryTest {
 
     @Autowired
-    MemberRepository memberJpaRepository;
+    MemberJpaRepository memberJpaRepository;
 
     @Test
     @DisplayName("회원을 생성한다")
@@ -77,5 +76,23 @@ class MemberJpaRepositoryTest {
         long count = memberJpaRepository.count();
 
         assertThat(count).isEqualTo(2);
+    }
+
+    @Test
+    @DisplayName("이름과_나이로_회원을_조회한다")
+    void findByUserNameAndAgeGreaterThan() {
+        Member sjhello = new Member("sjhello", 30);
+        Member sjhello2 = new Member("sjhello", 40);
+        Member sjhello3 = new Member("sjhello", 50);
+        Member sjhello4 = new Member("sjhello", 60);
+
+        memberJpaRepository.save(sjhello);
+        memberJpaRepository.save(sjhello2);
+        memberJpaRepository.save(sjhello3);
+        memberJpaRepository.save(sjhello4);
+
+        List<Member> members = memberJpaRepository.findByUsernameAndAgeGreaterThan("sjhello", 30);
+
+        assertThat(members).hasSize(3);
     }
 }
