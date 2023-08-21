@@ -117,4 +117,24 @@ class MemberJpaRepositoryTest {
 
         assertThat(members).hasSize(1);
     }
+
+    @Test
+    @DisplayName("회원 페이징")
+    void findByPageTest() {
+        int age = 20;
+
+        memberJpaRepository.save(new Member("sjhello1", age));
+        memberJpaRepository.save(new Member("sjhello2", age));
+        memberJpaRepository.save(new Member("sjhello3", age));
+        memberJpaRepository.save(new Member("sjhello4", age));
+        memberJpaRepository.save(new Member("sjhello5", age));
+
+        int offset = 1;
+        int limit = 3;
+        List<Member> members = memberJpaRepository.findByPage(age, offset, limit);
+        Long count = memberJpaRepository.totalCount(age);
+
+        assertThat(members).hasSize(3);
+        assertThat(count).isEqualTo(5);
+    }
 }

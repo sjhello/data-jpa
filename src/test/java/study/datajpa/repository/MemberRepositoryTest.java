@@ -4,6 +4,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import study.datajpa.dto.MemberDto;
@@ -116,5 +119,38 @@ class MemberRepositoryTest {
         List<MemberDto> memberDto = memberRepository.findMemberDto();
 
         assertThat(memberDto).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("회원 페이징")
+    void 회원을_페이징하여_조회한다() {
+        Integer age = 20;
+        memberRepository.save(new Member("sjhello1", age));
+        memberRepository.save(new Member("sjhello2", age));
+        memberRepository.save(new Member("sjhello3", age));
+        memberRepository.save(new Member("sjhello4", age));
+        memberRepository.save(new Member("sjhello5", age));
+
+        PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "username"));
+        Page<Member> pageMember = memberRepository.findByAge(age, pageRequest);
+
+        assertThat(pageMember.getContent()).hasSize(3);     // 조회된 데이터 수
+        assertThat(pageMember.getTotalElements()).isEqualTo(5);     // 총 데이터 수
+        assertThat(pageMember.getTotalPages()).isEqualTo(2);        // 총 몇 페이지야?
+        assertThat(pageMember.isFirst()).isTrue();      // 첫번쨰 페이지?
+        assertThat(pageMember.hasNext()).isTrue();      // 다음 페이지 있어?
+    }
+
+    @Test
+    void 회원의_count를_조회한다() {
+        Integer age = 20;
+        memberRepository.save(new Member("sjhello1", age));
+        memberRepository.save(new Member("sjhello2", age));
+        memberRepository.save(new Member("sjhello3", age));
+
+        PageRequest pageRequest = PageRequest.ofSize(2);
+        Page<Member> memberAllCountBy = memberRepository.findMemberAllCountBy(pageRequest);
+
+        assertThat(memberAllCountBy.getTotalElements()).isEqualTo(3);
     }
 }
