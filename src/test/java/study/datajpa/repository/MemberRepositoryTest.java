@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +17,7 @@ import study.datajpa.entity.Team;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @SpringBootTest
 @Transactional
@@ -122,8 +124,8 @@ class MemberRepositoryTest {
     }
 
     @Test
-    @DisplayName("회원 페이징")
-    void 회원을_페이징하여_조회한다() {
+    @DisplayName("회원 페이징 - Page")
+    void 회원을_페이징하여_조회한다_Page() {
         Integer age = 20;
         memberRepository.save(new Member("sjhello1", age));
         memberRepository.save(new Member("sjhello2", age));
@@ -132,13 +134,44 @@ class MemberRepositoryTest {
         memberRepository.save(new Member("sjhello5", age));
 
         PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "username"));
-        Page<Member> pageMember = memberRepository.findByAge(age, pageRequest);
+        Page<Member> pageMember = memberRepository.findByAgeAsPage(age, pageRequest);
 
         assertThat(pageMember.getContent()).hasSize(3);     // 조회된 데이터 수
         assertThat(pageMember.getTotalElements()).isEqualTo(5);     // 총 데이터 수
         assertThat(pageMember.getTotalPages()).isEqualTo(2);        // 총 몇 페이지야?
         assertThat(pageMember.isFirst()).isTrue();      // 첫번쨰 페이지?
         assertThat(pageMember.hasNext()).isTrue();      // 다음 페이지 있어?
+    }
+
+    @Test
+    @DisplayName("회원 페이징 - Page")
+    void 회원을_페이지번호로_조회한다_Page() {
+        // given
+        Integer age = 20;
+        memberRepository.save(new Member("sjhello1", age));
+        memberRepository.save(new Member("sjhello2", age));
+        memberRepository.save(new Member("sjhello3", age));
+        memberRepository.save(new Member("sjhello4", age));
+        memberRepository.save(new Member("sjhello5", age));
+        memberRepository.save(new Member("sjhello5", age));
+
+        // when
+        PageRequest firstPageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "username"));
+        Page<Member> firstPageMember = memberRepository.findByAgeAsPage(age, firstPageRequest);
+        PageRequest secondPageRequest = PageRequest.of(1, 3, Sort.by(Sort.Direction.DESC, "username"));
+        Page<Member> secondPageMember = memberRepository.findByAgeAsPage(age, secondPageRequest);
+        PageRequest lastPageRequest = PageRequest.of(2, 3, Sort.by(Sort.Direction.DESC, "username"));
+        Page<Member> lastPageMember = memberRepository.findByAgeAsPage(age, lastPageRequest);
+
+        // then
+        assertThat(firstPageMember.isFirst()).isTrue();
+        assertThat(firstPageMember.hasNext()).isTrue();
+
+        assertThat(secondPageMember.isFirst()).isFalse();
+        assertThat(secondPageMember.hasNext()).isFalse();
+
+        assertThat(lastPageMember.isFirst()).isFalse();
+        assertThat(lastPageMember.hasPrevious()).isTrue();
     }
 
     @Test
@@ -152,5 +185,58 @@ class MemberRepositoryTest {
         Page<Member> memberAllCountBy = memberRepository.findMemberAllCountBy(pageRequest);
 
         assertThat(memberAllCountBy.getTotalElements()).isEqualTo(3);
+    }
+
+    @Test
+    @DisplayName("회원 페이징 - Slice")
+    void 회원을_페이징하여_조회한다_Slice() {
+        Integer age = 20;
+        memberRepository.save(new Member("sjhello1", age));
+        memberRepository.save(new Member("sjhello2", age));
+        memberRepository.save(new Member("sjhello3", age));
+        memberRepository.save(new Member("sjhello4", age));
+        memberRepository.save(new Member("sjhello5", age));
+
+        PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "username"));
+        Slice<Member> sliceMember = memberRepository.findByAgeAsSlice(age, pageRequest);
+
+        assertAll(() -> {
+            assertThat(sliceMember.getContent()).hasSize(3);
+            assertThat(sliceMember.getSize()).isEqualTo(3);
+            assertThat(sliceMember.nextOrLastPageable().getPageSize()).isEqualTo(3);
+            assertThat(sliceMember.isFirst()).isTrue();
+            assertThat(sliceMember.hasNext()).isTrue();
+        });
+    }
+
+    @Test
+    @DisplayName("회원 페이징 - Slice")
+    void 회원을_페이지번호로_조회한다_Slice() {
+        // given
+        Integer age = 20;
+        memberRepository.save(new Member("sjhello1", age));
+        memberRepository.save(new Member("sjhello2", age));
+        memberRepository.save(new Member("sjhello3", age));
+        memberRepository.save(new Member("sjhello4", age));
+        memberRepository.save(new Member("sjhello5", age));
+        memberRepository.save(new Member("sjhello5", age));
+
+        // when
+        PageRequest firstPageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "username"));
+        Slice<Member> firstPageMember = memberRepository.findByAgeAsSlice(age, firstPageRequest);
+        PageRequest secondPageRequest = PageRequest.of(1, 3, Sort.by(Sort.Direction.DESC, "username"));
+        Slice<Member> secondPageMember = memberRepository.findByAgeAsSlice(age, secondPageRequest);
+        PageRequest lastPageRequest = PageRequest.of(2, 3, Sort.by(Sort.Direction.DESC, "username"));
+        Slice<Member> lastPageMember = memberRepository.findByAgeAsSlice(age, lastPageRequest);
+
+        // then
+        assertThat(firstPageMember.isFirst()).isTrue();
+        assertThat(firstPageMember.hasNext()).isTrue();
+
+        assertThat(secondPageMember.isFirst()).isFalse();
+        assertThat(secondPageMember.hasNext()).isFalse();
+
+        assertThat(lastPageMember.isFirst()).isFalse();
+        assertThat(lastPageMember.hasPrevious()).isTrue();
     }
 }
