@@ -239,4 +239,19 @@ class MemberRepositoryTest {
         assertThat(lastPageMember.isFirst()).isFalse();
         assertThat(lastPageMember.hasPrevious()).isTrue();
     }
+
+    @Test
+    @DisplayName("회원 벌크성 수정 쿼리")
+    void bulkAgeUpdate() {
+        Integer age = 20;
+        memberRepository.save(new Member("sjhello1", age));
+        memberRepository.save(new Member("sjhello2", age));
+        memberRepository.save(new Member("sjhello3", age));
+        memberRepository.save(new Member("sjhello4", age));
+        memberRepository.save(new Member("sjhello5", age));
+
+        int updateResult = memberRepository.bulkAgePlus(20);
+
+        assertThat(updateResult).isEqualTo(5);
+    }
 }

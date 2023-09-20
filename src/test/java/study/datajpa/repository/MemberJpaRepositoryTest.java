@@ -137,4 +137,19 @@ class MemberJpaRepositoryTest {
         assertThat(members).hasSize(3);
         assertThat(count).isEqualTo(5);
     }
+
+    @Test
+    @DisplayName("회원 벌크성 수정 쿼리")
+    void bulkAgeUpdate() {
+        int age = 20;
+        memberJpaRepository.save(new Member("sjhello1", age));
+        memberJpaRepository.save(new Member("sjhello2", age));
+        memberJpaRepository.save(new Member("sjhello3", age));
+        memberJpaRepository.save(new Member("sjhello4", age));
+        memberJpaRepository.save(new Member("sjhello5", age));
+
+        int updateResult = memberJpaRepository.bulkAgePlus(age);
+
+        assertThat(updateResult).isEqualTo(5);
+    }
 }
