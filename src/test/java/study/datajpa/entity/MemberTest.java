@@ -13,14 +13,14 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
+@Transactional
+@Rollback(value = false)
 class MemberTest {
 
     @PersistenceContext
     EntityManager em;
 
     @Test
-    @Transactional
-    @Rollback(value = false)
     public void createMember() {
         Team teamA = new Team("A Team");
         Team teamB = new Team("B Team");
