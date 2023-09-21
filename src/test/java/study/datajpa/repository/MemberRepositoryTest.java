@@ -286,4 +286,38 @@ class MemberRepositoryTest {
             member.getTeam().getName();
         }
     }
+
+    @Test
+    @DisplayName("QueryHint - readOnly")
+    void queryHintReadOnlyTest() {
+        // given
+        Member member = new Member("sjhello", 20);
+        memberRepository.save(member);
+        em.flush();
+        em.clear();
+
+        // when
+        // Member findMember = memberRepository.findReadOnlyByUsername("sjhello");
+        Member findMember = memberRepository.findMemberByUsername("sjhello");
+        findMember.setUsername("memberA");
+        em.flush();
+    }
+
+    @Test
+    @DisplayName("QueryHint - Page")
+    void queryHintPageTest() {
+        // given
+        memberRepository.save(new Member("sjhello", 20));
+        memberRepository.save(new Member("sjhello", 20));
+        memberRepository.save(new Member("sjhello", 20));
+        memberRepository.save(new Member("sjhello", 20));
+        memberRepository.save(new Member("sjhello", 20));
+
+        // when
+        PageRequest pageRequest = PageRequest.of(0, 3);
+        Page<Member> members = memberRepository.findByUsername("sjhello", pageRequest);
+
+        // then
+        assertThat(members).hasSize(3);
+    }
 }
