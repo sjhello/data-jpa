@@ -1,5 +1,6 @@
 package study.datajpa.repository;
 
+import org.hibernate.Hibernate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import study.datajpa.dto.MemberDto;
 import study.datajpa.entity.Member;
 import study.datajpa.entity.Team;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,6 +31,11 @@ class MemberRepositoryTest {
 
     @Autowired
     TeamRepository teamRepository;
+
+    @Autowired
+    EntityManager em;
+
+
 
     @Test
     @DisplayName("이름과_나이로_회원을_조회한다")
@@ -253,5 +260,30 @@ class MemberRepositoryTest {
         int updateResult = memberRepository.bulkAgePlus(20);
 
         assertThat(updateResult).isEqualTo(5);
+    }
+
+    @Test
+    @DisplayName("엔티티 그래프")
+    void entityGraph() {
+        Team teamA = new Team("teamA");
+        Team teamB = new Team("teamB");
+        teamRepository.save(teamA);
+        teamRepository.save(teamB);
+        Member sjhello = new Member("sjhello", 20, teamA);
+        Member sjhello1 = new Member("sjhello", 20, teamB);
+        memberRepository.save(sjhello);
+        memberRepository.save(sjhello1);
+
+        em.flush();
+        em.clear();
+
+//        List<Member> members = memberRepository.findAll();
+        List<Member> membersEntityGraph = memberRepository.findMembersEntityGraph();
+//        List<Member> memberList = memberRepository.findByUsernameAndAge("sjhello", 20);
+//        List<Member> membersNamedEntityGraph = memberRepository.findMembersNamedEntityGraph();
+
+        for (Member member : membersEntityGraph) {
+            member.getTeam().getName();
+        }
     }
 }

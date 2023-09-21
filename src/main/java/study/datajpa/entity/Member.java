@@ -1,6 +1,5 @@
 package study.datajpa.entity;
 
-import jdk.jfr.Name;
 import lombok.*;
 
 import javax.persistence.*;
@@ -10,6 +9,7 @@ import javax.persistence.*;
             query = "select m from Member m where m.username = :username")
 @NamedQuery(name = "Member.findByAge",
             query = "select m from Member m where m.age = :age")
+@NamedEntityGraph(name = "Member.all", attributeNodes = @NamedAttributeNode("team"))
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

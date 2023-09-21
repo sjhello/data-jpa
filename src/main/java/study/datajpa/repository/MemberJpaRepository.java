@@ -89,4 +89,13 @@ public class MemberJpaRepository {
                 .setParameter("age", age)
                 .executeUpdate();
     }
+
+    /**
+     * EntityGraph
+     *  - fetch join의 간편한 버전
+     * */
+    public List<Member> findMemberFetchJoin() {
+        return em.createQuery("select m from Member m left join fetch m.team", Member.class)
+                .getResultList();
+    }
 }

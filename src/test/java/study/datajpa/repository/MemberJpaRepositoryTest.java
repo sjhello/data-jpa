@@ -7,9 +7,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import study.datajpa.entity.Member;
+import study.datajpa.entity.Team;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,6 +23,12 @@ class MemberJpaRepositoryTest {
 
     @Autowired
     MemberJpaRepository memberJpaRepository;
+
+    @Autowired
+    TeamJpaRepository teamJpaRepository;
+
+    @Autowired
+    EntityManager em;
 
     @Test
     @DisplayName("회원을 생성한다")
@@ -151,5 +160,28 @@ class MemberJpaRepositoryTest {
         int updateResult = memberJpaRepository.bulkAgePlus(age);
 
         assertThat(updateResult).isEqualTo(5);
+    }
+
+    @Test
+    @DisplayName("엔티티 그래프")
+    void entityGraph() {
+        // given
+        Team teamA = new Team("teamA");
+        Team teamB = new Team("teamB");
+        teamJpaRepository.save(teamA);
+        teamJpaRepository.save(teamB);
+        Member sjhello = new Member("sjhello", 20, teamA);
+        Member sjhello1 = new Member("sjhello", 20, teamB);
+        memberJpaRepository.save(sjhello);
+        memberJpaRepository.save(sjhello1);
+
+        em.flush();
+        em.clear();
+
+        // when - query log
+        List<Member> members = memberJpaRepository.findMemberFetchJoin();
+        List<String> teamNames = members.stream()
+                .map(member -> member.getTeam().getName())
+                .collect(Collectors.toList());
     }
 }
